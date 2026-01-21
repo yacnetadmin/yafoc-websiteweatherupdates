@@ -9,14 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --bg: #f6f1ea;
-        --card: #fff8f0;
-        --ink: #1f1b16;
-        --muted: #6b6156;
-        --accent: #c2512a;
-        --accent-2: #224a3a;
-        --outline: #e6d6c8;
-        --shadow: 0 18px 40px rgba(31, 27, 22, 0.12);
+        --bg-start: #020813;
+        --bg-end: #041a2f;
+        --surface: rgba(7, 15, 32, 0.85);
+        --surface-border: rgba(123, 163, 255, 0.2);
+        --text: #eef6ff;
+        --muted: #9bb4d4;
+        --accent: #66ffe4;
+        --accent-strong: #05d4ff;
+        --error: #ff6e6e;
+        --radius: 18px;
         --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
         --font-head: "Space Grotesk", "IBM Plex Sans", sans-serif;
       }
@@ -27,10 +29,30 @@
 
       body {
         margin: 0;
-        font-family: var(--font-body);
-        color: var(--ink);
-        background: radial-gradient(circle at top, #fdf8f2 0%, #efe4d8 42%, #e8d8c9 100%);
         min-height: 100vh;
+        font-family: var(--font-body);
+        background: radial-gradient(circle at top, rgba(19, 61, 124, 0.55), transparent 45%),
+          radial-gradient(circle at 20% 20%, rgba(5, 212, 255, 0.15), transparent 35%),
+          linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: var(--text);
+        padding: 0 12px;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: linear-gradient(120deg, rgba(102, 255, 228, 0.08), transparent 60%),
+          radial-gradient(circle at 80% 10%, rgba(5, 212, 255, 0.15), transparent 40%);
+        z-index: -2;
+      }
+
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.03)' stroke-width='1'%3E%3Cpath d='M0 80h160M80 0v160'/%3E%3C/g%3E%3C/svg%3E") repeat;
+        opacity: 0.6;
+        z-index: -1;
       }
 
       .page {
@@ -80,11 +102,12 @@
       }
 
       .card {
-        background: var(--card);
-        border: 1px solid var(--outline);
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: var(--shadow);
+        background: var(--surface);
+        border: 1px solid var(--surface-border);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow: 0 25px 60px rgba(2, 8, 19, 0.55);
+        backdrop-filter: blur(14px);
       }
 
       .card h2 {
@@ -92,6 +115,7 @@
         margin: 0 0 16px;
         letter-spacing: 0.05em;
         text-transform: uppercase;
+        font-family: var(--font-head);
       }
 
       label {
@@ -107,11 +131,30 @@
       input[type="text"] {
         width: 100%;
         border-radius: 12px;
-        border: 1px solid var(--outline);
-        background: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(4, 12, 27, 0.8);
+        color: var(--text);
         padding: 12px;
         font-family: var(--font-body);
         font-size: 0.95rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(102, 255, 228, 0.25);
+      }
+
+      select {
+        appearance: none;
+        background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+          linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+        background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+        background-size: 7px 7px, 7px 7px;
+        background-repeat: no-repeat;
       }
 
       textarea {
@@ -130,9 +173,10 @@
         align-items: center;
         gap: 8px;
         padding: 10px 12px;
-        border: 1px solid var(--outline);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 14px;
-        background: #fff;
+        background: rgba(4, 12, 27, 0.6);
+        color: var(--text);
       }
 
       .field {
@@ -158,25 +202,33 @@
         border-radius: 999px;
         padding: 12px 24px;
         font-family: var(--font-body);
-        background: var(--accent);
-        color: #fff;
         cursor: pointer;
         font-size: 1rem;
         font-weight: 600;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
       }
 
-      button.secondary {
-        background: var(--accent-2);
+      button:active {
+        transform: scale(0.98);
       }
 
       button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+        transform: none;
       }
 
-      button:active:not(:disabled) {
-        transform: translateY(1px);
+      button.primary,
+      button#generateUpdate {
+        background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+        color: #041021;
+        box-shadow: 0 12px 30px rgba(102, 255, 228, 0.35);
+      }
+
+      button.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.15);
       }
 
       .preview-block {
@@ -208,12 +260,13 @@
       }
 
       .code-block {
-        font-family: "Courier New", monospace;
+        font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
         font-size: 0.85rem;
-        background: #1c1917;
-        color: #f9f4ee;
+        background: rgba(0, 0, 0, 0.35);
+        color: #eef6ff;
         padding: 14px;
         border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         overflow-x: auto;
         white-space: pre-wrap;
       }
@@ -222,12 +275,14 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #f1dfd0;
+        background: rgba(102, 255, 228, 0.15);
+        border: 1px solid rgba(102, 255, 228, 0.3);
         border-radius: 999px;
         padding: 6px 12px;
         font-family: var(--font-body);
         font-size: 0.78rem;
         letter-spacing: 0.04em;
+        color: var(--accent);
       }
 
       .alert {
@@ -239,18 +294,21 @@
       }
 
       .alert-info {
-        background: #e0f2fe;
-        color: #075985;
+        background: rgba(5, 212, 255, 0.15);
+        color: var(--accent-strong);
+        border: 1px solid rgba(5, 212, 255, 0.3);
       }
 
       .alert-success {
-        background: #d2e8df;
-        color: #224a3a;
+        background: rgba(102, 255, 228, 0.15);
+        color: var(--accent);
+        border: 1px solid rgba(102, 255, 228, 0.3);
       }
 
       .alert-error {
-        background: #fee2e2;
-        color: #991b1b;
+        background: rgba(255, 110, 110, 0.15);
+        color: var(--error);
+        border: 1px solid rgba(255, 110, 110, 0.3);
       }
 
       @media (max-width: 900px) {
@@ -261,7 +319,7 @@
     </style>
   </head>
   <body>
-  <body>
+    <div class="backdrop"></div>
     <div class="page">
       <header>
         <h1>WebSite Weather Alert</h1>

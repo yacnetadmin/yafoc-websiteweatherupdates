@@ -758,22 +758,33 @@
 <div id="weather-banner-${campusKey}" style="display:none; padding: 14px 18px; border-radius: 8px; background: #F97316; border: 2px solid #EA580C; font-family: 'Sora', sans-serif; color: #FFFFFF; margin-bottom: 16px; font-weight: 700;"></div>
 <script>
 (function() {
-  fetch("${CONFIG.dataUrl}?t=" + Date.now(), { cache: "no-store" })
-    .then(r => r.json())
-    .then(data => {
-      const banner = document.getElementById("weather-banner-${campusKey}");
-      const isLive = data.message && 
-                     data.validUntil && 
-                     new Date(data.validUntil) > Date.now() &&
-                     data.campuses && 
-                     data.campuses.${campusKey};
-      
-      if (isLive) {
-        banner.textContent = "⚠ " + data.message;
-        banner.style.display = "block";
-      }
-    })
-    .catch(() => {});
+  const banner = document.getElementById("weather-banner-${campusKey}");
+  
+  function checkAlert() {
+    fetch("${CONFIG.dataUrl}?t=" + Date.now(), { cache: "no-store" })
+      .then(r => r.json())
+      .then(data => {
+        const isLive = data.message && 
+                       data.validUntil && 
+                       new Date(data.validUntil) > Date.now() &&
+                       data.campuses && 
+                       data.campuses.${campusKey};
+        
+        if (isLive) {
+          banner.textContent = "⚠ " + data.message;
+          banner.style.display = "block";
+        } else {
+          banner.style.display = "none";
+        }
+      })
+      .catch(() => {});
+  }
+  
+  // Check immediately on page load
+  checkAlert();
+  
+  // Check every 5 minutes (300000 milliseconds)
+  setInterval(checkAlert, 300000);
 })();
 ${scriptClose}`;
 

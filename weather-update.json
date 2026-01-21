@@ -4,8 +4,8 @@
     "springGrove": true,
     "stewartstown": true
   },
-  "message": "Weather is not expected to impact todays scheduled events",
-  "validForHours": 0.0833,
-  "validUntil": "2026-01-21T20:30:56.870Z",
-  "issuedAt": "2026-01-21T20:25:56.990Z"
+  "message": "Test Alert - There is no weather update at this time -",
+  "validForHours": 1,
+  "validUntil": "2026-01-21T21:40:21.972Z",
+  "issuedAt": "2026-01-21T20:40:21.972Z"
 }

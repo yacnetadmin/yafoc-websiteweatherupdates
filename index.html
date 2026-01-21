@@ -486,6 +486,11 @@
         dataUrl: "https://raw.githubusercontent.com/yacnetadmin/yafoc-websiteweatherupdates/main/weather-update.json"
       };
 
+      // Pending update countdown
+      let pendingCountdown = null;
+      let countdownSeconds = 0;
+      let lastSubmittedMessage = null;
+
       // DOM Elements
       const githubToken = document.getElementById("githubToken");
       const updateText = document.getElementById("updateText");
@@ -601,6 +606,54 @@
         setTimeout(() => loadCurrentStatus(), 2000);
       }
 
+      function startPendingCountdown(message) {
+        // Clear any existing countdown
+        if (pendingCountdown) {
+          clearInterval(pendingCountdown);
+        }
+
+        lastSubmittedMessage = message;
+        countdownSeconds = 300; // 5 minutes
+
+        // Show pending state immediately
+        updatePendingDisplay();
+
+        // Update countdown every second
+        pendingCountdown = setInterval(() => {
+          countdownSeconds--;
+          if (countdownSeconds <= 0) {
+            clearInterval(pendingCountdown);
+            pendingCountdown = null;
+          }
+          updatePendingDisplay();
+        }, 1000);
+      }
+
+      function updatePendingDisplay() {
+        if (!pendingCountdown) return;
+
+        const minutes = Math.floor(countdownSeconds / 60);
+        const seconds = countdownSeconds % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        previewText.innerHTML = `<div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-size: 1rem; color: #05d4ff;">⏱ Update Publishing...</div>
+          <div style="font-size: 0.85rem; opacity: 0.8;">Expected in: ${timeString}</div>
+          <div style="font-size: 0.9rem; margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">${lastSubmittedMessage}</div>
+        </div>`;
+        previewText.classList.add("inactive");
+        previewText.style.background = "rgba(5, 212, 255, 0.1)";
+        previewText.style.borderColor = "rgba(5, 212, 255, 0.3)";
+      }
+
+      function clearPendingCountdown() {
+        if (pendingCountdown) {
+          clearInterval(pendingCountdown);
+          pendingCountdown = null;
+        }
+        lastSubmittedMessage = null;
+      }
+
       async function updateRepository(data) {
         const token = githubToken.value.trim();
         if (!token) {
@@ -642,6 +695,9 @@
 
           showStatus("✓ Update publishing! Checking for changes...", "success");
           
+          // Start pending countdown
+          startPendingCountdown(data.message || "Alert update");
+          
           // Start aggressive polling
           startAggressivePolling();
           
@@ -662,15 +718,27 @@
 
         const isLive = data.message && data.validUntil && new Date(data.validUntil) > new Date();
         
+        // If we have a live alert and there's a pending countdown, clear it
+        if (isLive && pendingCountdown && data.message === lastSubmittedMessage) {
+          clearPendingCountdown();
+        }
+        
         statusPill.textContent = isLive ? "Status: Live Alert" : "Status: No Alert";
         statusPill.style.background = isLive ? "#d2e8df" : "#f1dfd0";
         
-        if (isLive) {
-          previewText.textContent = "⚠ " + data.message;
-          previewText.classList.remove("inactive");
-        } else {
-          previewText.textContent = "No active update.";
-          previewText.classList.add("inactive");
+        // Only update preview if not waiting for pending update
+        if (!pendingCountdown) {
+          if (isLive) {
+            previewText.textContent = "⚠ " + data.message;
+            previewText.classList.remove("inactive");
+            previewText.style.background = "";
+            previewText.style.borderColor = "";
+          } else {
+            previewText.textContent = "No active update.";
+            previewText.classList.add("inactive");
+            previewText.style.background = "";
+            previewText.style.borderColor = "";
+          }
         }
         
         const campuses = data.campuses ? Object.keys(data.campuses).filter(k => data.campuses[k]) : [];

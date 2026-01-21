@@ -84,7 +84,8 @@
       }
 
       textarea,
-      select {
+      select,
+      input[type="text"] {
         width: 100%;
         border-radius: 12px;
         border: 1px solid var(--outline);
@@ -136,11 +137,13 @@
       button {
         border: none;
         border-radius: 999px;
-        padding: 10px 18px;
+        padding: 12px 24px;
         font-family: "Sora", "Segoe UI", sans-serif;
         background: var(--accent);
         color: #fff;
         cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
@@ -148,7 +151,12 @@
         background: var(--accent-2);
       }
 
-      button:active {
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      button:active:not(:disabled) {
         transform: translateY(1px);
       }
 
@@ -194,6 +202,29 @@
         letter-spacing: 0.04em;
       }
 
+      .alert {
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+
+      .alert-info {
+        background: #e0f2fe;
+        color: #075985;
+      }
+
+      .alert-success {
+        background: #d2e8df;
+        color: #224a3a;
+      }
+
+      .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
       @media (max-width: 900px) {
         .layout {
           grid-template-columns: 1fr;
@@ -202,248 +233,351 @@
     </style>
   </head>
   <body>
+  <body>
     <div class="page">
       <header>
         <h1>Weather Update Publisher</h1>
         <p class="subtitle">
-          Craft a clear, time-bound weather update and instantly generate the snippet for each Squarespace embed block.
+          Set a weather alert, select affected campuses, and set duration. Click Generate Update to publish.
         </p>
       </header>
+
+      <div id="setupAlert" class="alert alert-info" style="display: none;">
+        <strong>First Time Setup:</strong> Enter your GitHub Personal Access Token below to enable automatic publishing.
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Weather%20Update%20Publisher" target="_blank" style="color: #075985; text-decoration: underline;">Create token here</a>
+      </div>
+
+      <div id="statusAlert" style="display: none;"></div>
 
       <div class="layout">
         <section class="card">
           <h2>Compose Update</h2>
+          
           <div class="field">
-            <label for="updateText">What is the update that needs to be communicated?</label>
+            <label for="githubToken">GitHub Token (stored locally)</label>
+            <input
+              type="text"
+              id="githubToken"
+              placeholder="ghp_..."
+              autocomplete="off"
+            />
+            <div class="hint">Required for automatic publishing. <a href="https://github.com/settings/tokens/new?scopes=repo&description=Weather%20Update%20Publisher" target="_blank">Get token</a></div>
+          </div>
+
+          <div class="field">
+            <label for="updateText">Weather Alert Message</label>
             <textarea
               id="updateText"
               placeholder="Example: Due to icy roads, evening activities are canceled tonight. Updates will follow by 8 PM."
             ></textarea>
-            <div class="hint">This paragraph becomes the live banner text.</div>
           </div>
 
           <div class="field">
-            <label>Which campuses are impacted by this update?</label>
-            <div class="radio-group" role="group" aria-label="Campus selection">
+            <label>Affected Campuses</label>
+            <div class="radio-group" role="group">
               <label class="radio">
-                <input type="checkbox" name="campus" value="york" data-label="York" checked />
+                <input type="checkbox" name="campus" value="york" checked />
                 York
               </label>
               <label class="radio">
-                <input type="checkbox" name="campus" value="springGrove" data-label="Spring Grove" />
+                <input type="checkbox" name="campus" value="springGrove" />
                 Spring Grove
               </label>
               <label class="radio">
-                <input type="checkbox" name="campus" value="stewartstown" data-label="Stewartstown" />
+                <input type="checkbox" name="campus" value="stewartstown" />
                 Stewartstown
               </label>
             </div>
           </div>
 
           <div class="field">
-            <label for="validHours">How many hours is this update valid for?</label>
+            <label for="validHours">Valid Duration (hours)</label>
             <select id="validHours"></select>
-            <div class="hint">Select a duration from 1 to 36 hours.</div>
           </div>
 
           <div class="button-row">
             <button type="button" id="generateUpdate">Generate Update</button>
+            <button type="button" id="clearUpdate" class="secondary">Clear Alert</button>
           </div>
         </section>
 
         <section class="card">
-          <h2>Live Output</h2>
-          <div class="pill" id="statusPill">Status: Draft</div>
+          <h2>Live Status</h2>
+          <div class="pill" id="statusPill">Status: No Alert</div>
+          
           <div class="field">
-            <label>Banner Preview</label>
+            <label>Current Alert</label>
             <div class="preview-block" id="previewText">No active update.</div>
           </div>
+          
           <div class="meta" id="metaInfo">
             <span>Campuses: -</span>
-            <span>Valid For: -</span>
-            <span>Valid Until: -</span>
-            <span>Countdown: -</span>
+            <span>Duration: -</span>
+            <span>Expires: -</span>
+            <span>Time Remaining: -</span>
           </div>
+
           <div class="field" style="margin-top: 16px;">
-            <label>Squarespace Embed Text - York</label>
-            <div class="code-block" id="embedCodeYork">(empty)</div>
-          </div>
-          <div class="field">
-            <label>Squarespace Embed Text - Spring Grove</label>
-            <div class="code-block" id="embedCodeSpringGrove">(empty)</div>
-          </div>
-          <div class="field">
-            <label>Squarespace Embed Text - Stewartstown</label>
-            <div class="code-block" id="embedCodeStewartstown">(empty)</div>
-          </div>
-          <div class="field">
-            <label>Repository Payload JSON</label>
-            <div class="code-block" id="payloadCode">{}</div>
-            <div class="hint">Save this JSON to your GitHub repository so the embed scripts can fetch it.</div>
+            <label>Embed Code (for Squarespace)</label>
+            <div class="code-block" id="embedCode">(Click Generate Update first)</div>
+            <div class="hint">Copy this code into a Squarespace Code Block</div>
           </div>
         </section>
       </div>
     </div>
 
     <script>
-      const updateText = document.querySelector("#updateText");
+      const CONFIG = {
+        owner: "yacnetadmin",
+        repo: "yafoc-websiteweatherupdates",
+        branch: "main",
+        dataFile: "weather-update.json",
+        dataUrl: "https://raw.githubusercontent.com/yacnetadmin/yafoc-websiteweatherupdates/main/weather-update.json"
+      };
+
+      // DOM Elements
+      const githubToken = document.getElementById("githubToken");
+      const updateText = document.getElementById("updateText");
       const campusInputs = document.querySelectorAll("input[name='campus']");
-      const validHours = document.querySelector("#validHours");
-      const previewText = document.querySelector("#previewText");
-      const embedCodeYork = document.querySelector("#embedCodeYork");
-      const embedCodeSpringGrove = document.querySelector("#embedCodeSpringGrove");
-      const embedCodeStewartstown = document.querySelector("#embedCodeStewartstown");
-      const payloadCode = document.querySelector("#payloadCode");
-      const statusPill = document.querySelector("#statusPill");
-      const metaInfo = document.querySelector("#metaInfo");
-      const generateUpdate = document.querySelector("#generateUpdate");
-      let issuedAt = new Date();
-      const payloadUrl =
-        "https://raw.githubusercontent.com/yacnetadmin/yafoc-websiteweatherwpdates/main/weather-update.json";
+      const validHours = document.getElementById("validHours");
+      const generateBtn = document.getElementById("generateUpdate");
+      const clearBtn = document.getElementById("clearUpdate");
+      const previewText = document.getElementById("previewText");
+      const embedCode = document.getElementById("embedCode");
+      const statusPill = document.getElementById("statusPill");
+      const metaInfo = document.getElementById("metaInfo");
+      const setupAlert = document.getElementById("setupAlert");
+      const statusAlert = document.getElementById("statusAlert");
 
-      const formatDateTime = (value) => {
-        if (!value) return "-";
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return "—";
-        return date.toLocaleString();
-      };
-
-      const getSelectedCampuses = () =>
-        [...campusInputs]
-          .filter((input) => input.checked)
-          .map((input) => input.dataset.label);
-
-      const getSelectedCampusKeys = () =>
-        [...campusInputs].filter((input) => input.checked).map((input) => input.value);
-
-      const updateIssuedAt = () => {
-        issuedAt = new Date();
-      };
-
-      const getCountdown = (value) => {
-        if (!value) return "—";
-        const now = new Date();
-        const target = new Date(value);
-        const diff = target.getTime() - now.getTime();
-        if (Number.isNaN(diff)) return "—";
-        if (diff <= 0) return "Expired";
-        const hours = Math.floor(diff / 36e5);
-        const minutes = Math.floor((diff % 36e5) / 6e4);
-        return `${hours}h ${minutes}m`;
-      };
-
-      const buildPayload = (text, campusKeys, validUntilValue, validForHours, issuedAtValue) => {
-        const flags = {
-          york: false,
-          springGrove: false,
-          stewartstown: false,
-        };
-        campusKeys.forEach((key) => {
-          if (Object.prototype.hasOwnProperty.call(flags, key)) {
-            flags[key] = true;
-          }
-        });
-        return {
-          campuses: flags,
-          message: text,
-          validForHours: validForHours || null,
-          validUntil: validUntilValue || null,
-          issuedAt: issuedAtValue || null,
-        };
-      };
-
-      const buildEmbedSnippet = (campusKey, campusLabel, url) => {
-        const scriptClose = "</scr" + "ipt>";
-        return `<!-- Weather update embed: ${campusLabel} -->
-<div id="weather-update-${campusKey}" style="display:none; padding: 12px 16px; border-radius: 12px; background: #f1dfd0; font-family: 'Sora', 'Segoe UI', sans-serif; color: #1f1b16;">
-</div>
-<script>
-(() => {
-  const campusKey = "${campusKey}";
-  const container = document.getElementById("weather-update-${campusKey}");
-  if (!container) return;
-  fetch("${url}", { cache: "no-store" })
-    .then((response) => response.json())
-    .then((payload) => {
-      const isLive =
-        payload.message &&
-        payload.validUntil &&
-        new Date(payload.validUntil).getTime() > Date.now() &&
-        payload.campuses &&
-        payload.campuses[campusKey];
-
-      if (isLive) {
-        container.textContent = payload.message;
-        container.style.display = "block";
-      } else {
-        container.style.display = "none";
-      }
-    })
-    .catch(() => {
-      container.style.display = "none";
-    });
-})();
-${scriptClose}`;
-      };
-
-      const refreshOutput = () => {
-        const text = updateText.value.trim();
-        const selectedCampuses = getSelectedCampuses();
-        const selectedCampusKeys = getSelectedCampusKeys();
-        const validForHours = Number(validHours.value) || 0;
-        const validUntilValue =
-          validForHours > 0 ? new Date(issuedAt.getTime() + validForHours * 36e5).toISOString() : null;
-        const countdown = getCountdown(validUntilValue);
-        const stillValid =
-          text.length > 0 &&
-          selectedCampusKeys.length > 0 &&
-          validForHours > 0 &&
-          validUntilValue &&
-          new Date(validUntilValue).getTime() > Date.now();
-        const payload = buildPayload(
-          text,
-          selectedCampusKeys,
-          validUntilValue,
-          validForHours,
-          issuedAt.toISOString()
-        );
-
-        statusPill.textContent = stillValid ? "Status: Live" : "Status: Draft";
-        statusPill.style.background = stillValid ? "#d2e8df" : "#f1dfd0";
-
-        previewText.textContent = stillValid ? text : "No active update.";
-        embedCodeYork.textContent = buildEmbedSnippet("york", "York", payloadUrl);
-        embedCodeSpringGrove.textContent = buildEmbedSnippet("springGrove", "Spring Grove", payloadUrl);
-        embedCodeStewartstown.textContent = buildEmbedSnippet("stewartstown", "Stewartstown", payloadUrl);
-        payloadCode.textContent = JSON.stringify(payload, null, 2);
-
-        metaInfo.innerHTML = `
-          <span>Campuses: ${selectedCampuses.length ? selectedCampuses.join(", ") : "-"}</span>
-          <span>Valid For: ${validForHours ? `${validForHours} hour${validForHours === 1 ? "" : "s"}` : "-"}</span>
-          <span>Valid Until: ${formatDateTime(validUntilValue)}</span>
-          <span>Countdown: ${countdown}</span>
-        `;
-      };
-
-      for (let hour = 1; hour <= 36; hour += 1) {
+      // Populate hours dropdown
+      for (let hour = 1; hour <= 36; hour++) {
         const option = document.createElement("option");
-        option.value = String(hour);
+        option.value = hour;
         option.textContent = `${hour} hour${hour === 1 ? "" : "s"}`;
         validHours.appendChild(option);
       }
       validHours.value = "6";
 
-      updateText.addEventListener("input", refreshOutput);
-      campusInputs.forEach((input) => input.addEventListener("change", refreshOutput));
-      validHours.addEventListener("change", refreshOutput);
+      // Load token from localStorage
+      const savedToken = localStorage.getItem("githubToken");
+      if (savedToken) {
+        githubToken.value = savedToken;
+      } else {
+        setupAlert.style.display = "block";
+      }
 
-      generateUpdate.addEventListener("click", () => {
-        updateIssuedAt();
-        refreshOutput();
+      // Save token to localStorage
+      githubToken.addEventListener("change", () => {
+        const token = githubToken.value.trim();
+        if (token) {
+          localStorage.setItem("githubToken", token);
+          setupAlert.style.display = "none";
+        } else {
+          localStorage.removeItem("githubToken");
+        }
       });
 
-      refreshOutput();
-      setInterval(refreshOutput, 30_000);
+      function showStatus(message, type = "info") {
+        statusAlert.className = `alert alert-${type}`;
+        statusAlert.textContent = message;
+        statusAlert.style.display = "block";
+        setTimeout(() => {
+          statusAlert.style.display = "none";
+        }, 5000);
+      }
+
+      function getSelectedCampuses() {
+        return Array.from(campusInputs)
+          .filter(input => input.checked)
+          .map(input => input.value);
+      }
+
+      function formatDateTime(isoString) {
+        if (!isoString) return "-";
+        return new Date(isoString).toLocaleString();
+      }
+
+      function getTimeRemaining(validUntil) {
+        if (!validUntil) return "-";
+        const diff = new Date(validUntil) - new Date();
+        if (diff <= 0) return "Expired";
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        return `${hours}h ${minutes}m`;
+      }
+
+      async function fetchCurrentData() {
+        try {
+          const response = await fetch(CONFIG.dataUrl + "?t=" + Date.now(), { cache: "no-store" });
+          if (response.ok) {
+            return await response.json();
+          }
+        } catch (e) {
+          console.error("Failed to fetch current data:", e);
+        }
+        return null;
+      }
+
+      async function updateRepository(data) {
+        const token = githubToken.value.trim();
+        if (!token) {
+          showStatus("Please enter your GitHub token first", "error");
+          return false;
+        }
+
+        try {
+          generateBtn.disabled = true;
+          generateBtn.textContent = "Publishing...";
+
+          // Get current file SHA
+          const getFileUrl = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dataFile}`;
+          const getResponse = await fetch(getFileUrl, {
+            headers: {
+              "Authorization": `token ${token}`,
+              "Accept": "application/vnd.github.v3+json"
+            }
+          });
+
+          let sha = null;
+          if (getResponse.ok) {
+            const fileData = await getResponse.json();
+            sha = fileData.sha;
+          }
+
+          // Update file
+          const content = btoa(JSON.stringify(data, null, 2));
+          const updateUrl = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dataFile}`;
+          const updateResponse = await fetch(updateUrl, {
+            method: "PUT",
+            headers: {
+              "Authorization": `token ${token}`,
+              "Accept": "application/vnd.github.v3+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              message: data.message ? `Update weather alert: ${data.message.substring(0, 50)}...` : "Clear weather alert",
+              content: content,
+              branch: CONFIG.branch,
+              ...(sha && { sha })
+            })
+          });
+
+          if (!updateResponse.ok) {
+            const error = await updateResponse.json();
+            throw new Error(error.message || "Failed to update repository");
+          }
+
+          showStatus("Alert published successfully!", "success");
+          await loadCurrentStatus();
+          return true;
+
+        } catch (error) {
+          showStatus(`Error: ${error.message}`, "error");
+          return false;
+        } finally {
+          generateBtn.disabled = false;
+          generateBtn.textContent = "Generate Update";
+        }
+      }
+
+      async function loadCurrentStatus() {
+        const data = await fetchCurrentData();
+        if (!data) return;
+
+        const isLive = data.message && data.validUntil && new Date(data.validUntil) > new Date();
+        
+        statusPill.textContent = isLive ? "Status: Live Alert" : "Status: No Alert";
+        statusPill.style.background = isLive ? "#d2e8df" : "#f1dfd0";
+        
+        previewText.textContent = isLive ? data.message : "No active update.";
+        
+        const campuses = data.campuses ? Object.keys(data.campuses).filter(k => data.campuses[k]) : [];
+        metaInfo.innerHTML = `
+          <span>Campuses: ${campuses.length ? campuses.join(", ") : "-"}</span>
+          <span>Duration: ${data.validForHours ? `${data.validForHours} hour${data.validForHours === 1 ? "" : "s"}` : "-"}</span>
+          <span>Expires: ${formatDateTime(data.validUntil)}</span>
+          <span>Time Remaining: ${getTimeRemaining(data.validUntil)}</span>
+        `;
+
+        updateEmbedCode();
+      }
+
+      function updateEmbedCode() {
+        const scriptClose = "</scr" + "ipt>";
+        embedCode.textContent = `<!-- Weather Update Banner -->
+<div id="weather-banner" style="display:none; padding: 12px 16px; border-radius: 12px; background: #f1dfd0; font-family: 'Sora', sans-serif; margin-bottom: 16px;"></div>
+<script>
+(function() {
+  fetch("${CONFIG.dataUrl}?t=" + Date.now(), { cache: "no-store" })
+    .then(r => r.json())
+    .then(data => {
+      const banner = document.getElementById("weather-banner");
+      const isLive = data.message && data.validUntil && new Date(data.validUntil) > Date.now();
+      if (isLive) {
+        banner.textContent = data.message;
+        banner.style.display = "block";
+      }
+    })
+    .catch(() => {});
+})();
+${scriptClose}`;
+      }
+
+      generateBtn.addEventListener("click", async () => {
+        const message = updateText.value.trim();
+        if (!message) {
+          showStatus("Please enter a weather alert message", "error");
+          return;
+        }
+
+        const selectedCampuses = getSelectedCampuses();
+        if (selectedCampuses.length === 0) {
+          showStatus("Please select at least one campus", "error");
+          return;
+        }
+
+        const hours = parseInt(validHours.value);
+        const issuedAt = new Date().toISOString();
+        const validUntil = new Date(Date.now() + hours * 3600000).toISOString();
+
+        const data = {
+          campuses: {
+            york: selectedCampuses.includes("york"),
+            springGrove: selectedCampuses.includes("springGrove"),
+            stewartstown: selectedCampuses.includes("stewartstown")
+          },
+          message: message,
+          validForHours: hours,
+          validUntil: validUntil,
+          issuedAt: issuedAt
+        };
+
+        await updateRepository(data);
+      });
+
+      clearBtn.addEventListener("click", async () => {
+        if (!confirm("Clear the current weather alert?")) return;
+
+        const data = {
+          campuses: {
+            york: false,
+            springGrove: false,
+            stewartstown: false
+          },
+          message: "",
+          validForHours: null,
+          validUntil: null,
+          issuedAt: null
+        };
+
+        await updateRepository(data);
+      });
+
+      // Load current status on page load
+      loadCurrentStatus();
+      
+      // Refresh status every 30 seconds
+      setInterval(loadCurrentStatus, 30000);
     </script>
   </body>
 </html>

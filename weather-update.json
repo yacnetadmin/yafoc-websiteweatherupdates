@@ -1,0 +1,11 @@
+{
+  "campuses": {
+    "york": false,
+    "springGrove": false,
+    "stewartstown": false
+  },
+  "message": "",
+  "validForHours": null,
+  "validUntil": null,
+  "issuedAt": null
+}

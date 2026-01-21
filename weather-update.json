@@ -1,8 +1,8 @@
 {
   "campuses": {
     "york": true,
-    "springGrove": false,
-    "stewartstown": false
+    "springGrove": true,
+    "stewartstown": true
   },
   "message": "Weather is not expected to impact todays scheduled events",
   "validForHours": 0.0833,

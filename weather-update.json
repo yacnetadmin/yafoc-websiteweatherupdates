@@ -4,8 +4,8 @@
     "springGrove": false,
     "stewartstown": false
   },
-  "message": "Test Alert Orange",
+  "message": "Testing weather alert",
   "validForHours": 0.0833,
-  "validUntil": "2026-01-21T18:28:16.171Z",
-  "issuedAt": "2026-01-21T18:23:16.291Z"
+  "validUntil": "2026-01-21T18:40:42.957Z",
+  "issuedAt": "2026-01-21T18:35:43.077Z"
 }

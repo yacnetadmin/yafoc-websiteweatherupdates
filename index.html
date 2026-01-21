@@ -577,6 +577,30 @@
         return null;
       }
 
+      let aggressivePollingInterval = null;
+      function startAggressivePolling() {
+        // Clear any existing aggressive polling
+        if (aggressivePollingInterval) {
+          clearInterval(aggressivePollingInterval);
+        }
+
+        let attempts = 0;
+        const maxAttempts = 24; // 24 attempts × 5 seconds = 2 minutes
+
+        aggressivePollingInterval = setInterval(async () => {
+          attempts++;
+          await loadCurrentStatus();
+          
+          if (attempts >= maxAttempts) {
+            clearInterval(aggressivePollingInterval);
+            aggressivePollingInterval = null;
+          }
+        }, 5000); // Check every 5 seconds
+
+        // Also check immediately
+        setTimeout(() => loadCurrentStatus(), 2000);
+      }
+
       async function updateRepository(data) {
         const token = githubToken.value.trim();
         if (!token) {
@@ -616,12 +640,10 @@
             throw new Error(error.message || "Failed to trigger workflow");
           }
 
-          showStatus("Alert publishing started! Updates will appear in 10-20 seconds.", "success");
+          showStatus("✓ Update publishing! Checking for changes...", "success");
           
-          // Poll for updates
-          setTimeout(() => {
-            loadCurrentStatus();
-          }, 15000);
+          // Start aggressive polling
+          startAggressivePolling();
           
           return true;
 

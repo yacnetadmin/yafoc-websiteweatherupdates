@@ -50,17 +50,29 @@ jobs:
 
       - name: Update weather data
         run: |
-          cat > weather-update.json << 'EOF'
+          # Handle null/empty values properly
+          MESSAGE="${{ inputs.message }}"
+          VALID_HOURS="${{ inputs.validForHours }}"
+          VALID_UNTIL="${{ inputs.validUntil }}"
+          ISSUED_AT="${{ inputs.issuedAt }}"
+          
+          # Convert to proper null values if empty
+          if [ -z "$MESSAGE" ]; then MESSAGE_JSON="null"; else MESSAGE_JSON="\"$MESSAGE\""; fi
+          if [ "$VALID_HOURS" = "0" ] || [ -z "$VALID_HOURS" ]; then HOURS_JSON="null"; else HOURS_JSON="$VALID_HOURS"; fi
+          if [ -z "$VALID_UNTIL" ]; then UNTIL_JSON="null"; else UNTIL_JSON="\"$VALID_UNTIL\""; fi
+          if [ -z "$ISSUED_AT" ]; then ISSUED_JSON="null"; else ISSUED_JSON="\"$ISSUED_AT\""; fi
+          
+          cat > weather-update.json << EOF
           {
             "campuses": {
               "york": ${{ inputs.york }},
               "springGrove": ${{ inputs.springGrove }},
               "stewartstown": ${{ inputs.stewartstown }}
             },
-            "message": "${{ inputs.message }}",
-            "validForHours": ${{ inputs.validForHours }},
-            "validUntil": "${{ inputs.validUntil }}",
-            "issuedAt": "${{ inputs.issuedAt }}"
+            "message": $MESSAGE_JSON,
+            "validForHours": $HOURS_JSON,
+            "validUntil": $UNTIL_JSON,
+            "issuedAt": $ISSUED_JSON
           }
           EOF
 

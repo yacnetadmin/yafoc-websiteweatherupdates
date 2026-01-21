@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Weather Update Publisher</title>
+    <style>
+      :root {
+        --bg: #f6f1ea;
+        --card: #fff8f0;
+        --ink: #1f1b16;
+        --muted: #6b6156;
+        --accent: #c2512a;
+        --accent-2: #224a3a;
+        --outline: #e6d6c8;
+        --shadow: 0 18px 40px rgba(31, 27, 22, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Bodoni Moda", "Times New Roman", serif;
+        color: var(--ink);
+        background: radial-gradient(circle at top, #fdf8f2 0%, #efe4d8 42%, #e8d8c9 100%);
+        min-height: 100vh;
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 4vw, 3.1rem);
+        letter-spacing: 0.04em;
+        margin: 0;
+      }
+
+      .subtitle {
+        font-family: "Sora", "Segoe UI", sans-serif;
+        color: var(--muted);
+        margin: 0;
+        max-width: 720px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+        gap: 28px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--outline);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h2 {
+        font-size: 1.2rem;
+        margin: 0 0 16px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      label {
+        display: block;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        font-size: 0.92rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 8px;
+      }
+
+      textarea,
+      select {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--outline);
+        background: #fff;
+        padding: 12px;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        font-size: 0.95rem;
+      }
+
+      textarea {
+        min-height: 140px;
+        resize: vertical;
+      }
+
+      .radio-group {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+
+      .radio {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 1px solid var(--outline);
+        border-radius: 14px;
+        background: #fff;
+      }
+
+      .field {
+        margin-bottom: 18px;
+      }
+
+      .hint {
+        font-family: "Sora", "Segoe UI", sans-serif;
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-top: 6px;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button.secondary {
+        background: var(--accent-2);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .preview-block {
+        border: 1px dashed var(--outline);
+        padding: 16px;
+        border-radius: 14px;
+        background: #fff;
+        min-height: 92px;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        font-size: 0.95rem;
+      }
+
+      .meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .code-block {
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        background: #1c1917;
+        color: #f9f4ee;
+        padding: 14px;
+        border-radius: 14px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f1dfd0;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-family: "Sora", "Segoe UI", sans-serif;
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>Weather Update Publisher</h1>
+        <p class="subtitle">
+          Craft a clear, time-bound weather update and instantly generate the snippet for each Squarespace embed block.
+        </p>
+      </header>
+
+      <div class="layout">
+        <section class="card">
+          <h2>Compose Update</h2>
+          <div class="field">
+            <label for="updateText">What is the update that needs to be communicated?</label>
+            <textarea
+              id="updateText"
+              placeholder="Example: Due to icy roads, evening activities are canceled tonight. Updates will follow by 8 PM."
+            ></textarea>
+            <div class="hint">This paragraph becomes the live banner text.</div>
+          </div>
+
+          <div class="field">
+            <label>Which campuses are impacted by this update?</label>
+            <div class="radio-group" role="group" aria-label="Campus selection">
+              <label class="radio">
+                <input type="checkbox" name="campus" value="york" data-label="York" checked />
+                York
+              </label>
+              <label class="radio">
+                <input type="checkbox" name="campus" value="springGrove" data-label="Spring Grove" />
+                Spring Grove
+              </label>
+              <label class="radio">
+                <input type="checkbox" name="campus" value="stewartstown" data-label="Stewartstown" />
+                Stewartstown
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="validHours">How many hours is this update valid for?</label>
+            <select id="validHours"></select>
+            <div class="hint">Select a duration from 1 to 36 hours.</div>
+          </div>
+
+          <div class="button-row">
+            <button type="button" id="generateUpdate">Generate Update</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Live Output</h2>
+          <div class="pill" id="statusPill">Status: Draft</div>
+          <div class="field">
+            <label>Banner Preview</label>
+            <div class="preview-block" id="previewText">No active update.</div>
+          </div>
+          <div class="meta" id="metaInfo">
+            <span>Campuses: -</span>
+            <span>Valid For: -</span>
+            <span>Valid Until: -</span>
+            <span>Countdown: -</span>
+          </div>
+          <div class="field" style="margin-top: 16px;">
+            <label>Squarespace Embed Text - York</label>
+            <div class="code-block" id="embedCodeYork">(empty)</div>
+          </div>
+          <div class="field">
+            <label>Squarespace Embed Text - Spring Grove</label>
+            <div class="code-block" id="embedCodeSpringGrove">(empty)</div>
+          </div>
+          <div class="field">
+            <label>Squarespace Embed Text - Stewartstown</label>
+            <div class="code-block" id="embedCodeStewartstown">(empty)</div>
+          </div>
+          <div class="field">
+            <label>Repository Payload JSON</label>
+            <div class="code-block" id="payloadCode">{}</div>
+            <div class="hint">Save this JSON to your GitHub repository so the embed scripts can fetch it.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const updateText = document.querySelector("#updateText");
+      const campusInputs = document.querySelectorAll("input[name='campus']");
+      const validHours = document.querySelector("#validHours");
+      const previewText = document.querySelector("#previewText");
+      const embedCodeYork = document.querySelector("#embedCodeYork");
+      const embedCodeSpringGrove = document.querySelector("#embedCodeSpringGrove");
+      const embedCodeStewartstown = document.querySelector("#embedCodeStewartstown");
+      const payloadCode = document.querySelector("#payloadCode");
+      const statusPill = document.querySelector("#statusPill");
+      const metaInfo = document.querySelector("#metaInfo");
+      const generateUpdate = document.querySelector("#generateUpdate");
+      let issuedAt = new Date();
+      const payloadUrl =
+        "https://raw.githubusercontent.com/yacnetadmin/yafoc-websiteweatherwpdates/main/weather-update.json";
+
+      const formatDateTime = (value) => {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "—";
+        return date.toLocaleString();
+      };
+
+      const getSelectedCampuses = () =>
+        [...campusInputs]
+          .filter((input) => input.checked)
+          .map((input) => input.dataset.label);
+
+      const getSelectedCampusKeys = () =>
+        [...campusInputs].filter((input) => input.checked).map((input) => input.value);
+
+      const updateIssuedAt = () => {
+        issuedAt = new Date();
+      };
+
+      const getCountdown = (value) => {
+        if (!value) return "—";
+        const now = new Date();
+        const target = new Date(value);
+        const diff = target.getTime() - now.getTime();
+        if (Number.isNaN(diff)) return "—";
+        if (diff <= 0) return "Expired";
+        const hours = Math.floor(diff / 36e5);
+        const minutes = Math.floor((diff % 36e5) / 6e4);
+        return `${hours}h ${minutes}m`;
+      };
+
+      const buildPayload = (text, campusKeys, validUntilValue, validForHours, issuedAtValue) => {
+        const flags = {
+          york: false,
+          springGrove: false,
+          stewartstown: false,
+        };
+        campusKeys.forEach((key) => {
+          if (Object.prototype.hasOwnProperty.call(flags, key)) {
+            flags[key] = true;
+          }
+        });
+        return {
+          campuses: flags,
+          message: text,
+          validForHours: validForHours || null,
+          validUntil: validUntilValue || null,
+          issuedAt: issuedAtValue || null,
+        };
+      };
+
+      const buildEmbedSnippet = (campusKey, campusLabel, url) => {
+        const scriptClose = "</scr" + "ipt>";
+        return `<!-- Weather update embed: ${campusLabel} -->
+<div id="weather-update-${campusKey}" style="display:none; padding: 12px 16px; border-radius: 12px; background: #f1dfd0; font-family: 'Sora', 'Segoe UI', sans-serif; color: #1f1b16;">
+</div>
+<script>
+(() => {
+  const campusKey = "${campusKey}";
+  const container = document.getElementById("weather-update-${campusKey}");
+  if (!container) return;
+  fetch("${url}", { cache: "no-store" })
+    .then((response) => response.json())
+    .then((payload) => {
+      const isLive =
+        payload.message &&
+        payload.validUntil &&
+        new Date(payload.validUntil).getTime() > Date.now() &&
+        payload.campuses &&
+        payload.campuses[campusKey];
+
+      if (isLive) {
+        container.textContent = payload.message;
+        container.style.display = "block";
+      } else {
+        container.style.display = "none";
+      }
+    })
+    .catch(() => {
+      container.style.display = "none";
+    });
+})();
+${scriptClose}`;
+      };
+
+      const refreshOutput = () => {
+        const text = updateText.value.trim();
+        const selectedCampuses = getSelectedCampuses();
+        const selectedCampusKeys = getSelectedCampusKeys();
+        const validForHours = Number(validHours.value) || 0;
+        const validUntilValue =
+          validForHours > 0 ? new Date(issuedAt.getTime() + validForHours * 36e5).toISOString() : null;
+        const countdown = getCountdown(validUntilValue);
+        const stillValid =
+          text.length > 0 &&
+          selectedCampusKeys.length > 0 &&
+          validForHours > 0 &&
+          validUntilValue &&
+          new Date(validUntilValue).getTime() > Date.now();
+        const payload = buildPayload(
+          text,
+          selectedCampusKeys,
+          validUntilValue,
+          validForHours,
+          issuedAt.toISOString()
+        );
+
+        statusPill.textContent = stillValid ? "Status: Live" : "Status: Draft";
+        statusPill.style.background = stillValid ? "#d2e8df" : "#f1dfd0";
+
+        previewText.textContent = stillValid ? text : "No active update.";
+        embedCodeYork.textContent = buildEmbedSnippet("york", "York", payloadUrl);
+        embedCodeSpringGrove.textContent = buildEmbedSnippet("springGrove", "Spring Grove", payloadUrl);
+        embedCodeStewartstown.textContent = buildEmbedSnippet("stewartstown", "Stewartstown", payloadUrl);
+        payloadCode.textContent = JSON.stringify(payload, null, 2);
+
+        metaInfo.innerHTML = `
+          <span>Campuses: ${selectedCampuses.length ? selectedCampuses.join(", ") : "-"}</span>
+          <span>Valid For: ${validForHours ? `${validForHours} hour${validForHours === 1 ? "" : "s"}` : "-"}</span>
+          <span>Valid Until: ${formatDateTime(validUntilValue)}</span>
+          <span>Countdown: ${countdown}</span>
+        `;
+      };
+
+      for (let hour = 1; hour <= 36; hour += 1) {
+        const option = document.createElement("option");
+        option.value = String(hour);
+        option.textContent = `${hour} hour${hour === 1 ? "" : "s"}`;
+        validHours.appendChild(option);
+      }
+      validHours.value = "6";
+
+      updateText.addEventListener("input", refreshOutput);
+      campusInputs.forEach((input) => input.addEventListener("change", refreshOutput));
+      validHours.addEventListener("change", refreshOutput);
+
+      generateUpdate.addEventListener("click", () => {
+        updateIssuedAt();
+        refreshOutput();
+      });
+
+      refreshOutput();
+      setInterval(refreshOutput, 30_000);
+    </script>
+  </body>
+</html>

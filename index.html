@@ -244,7 +244,7 @@
 
       <div id="setupAlert" class="alert alert-info" style="display: none;">
         <strong>First Time Setup:</strong> Enter your GitHub Personal Access Token below to enable automatic publishing.
-        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Weather%20Update%20Publisher" target="_blank" style="color: #075985; text-decoration: underline;">Create token here</a>
+        <a href="https://github.com/settings/tokens/new?scopes=actions:write&description=Weather%20Update%20Publisher" target="_blank" style="color: #075985; text-decoration: underline;">Create token here</a>
       </div>
 
       <div id="statusAlert" style="display: none;"></div>
@@ -261,7 +261,7 @@
               placeholder="ghp_..."
               autocomplete="off"
             />
-            <div class="hint">Required for automatic publishing. <a href="https://github.com/settings/tokens/new?scopes=repo&description=Weather%20Update%20Publisher" target="_blank">Get token</a></div>
+            <div class="hint">Required to trigger updates. Needs 'actions:write' scope. <a href="https://github.com/settings/tokens/new?scopes=actions:write&description=Weather%20Update%20Publisher" target="_blank">Get token</a></div>
           </div>
 
           <div class="field">
@@ -429,46 +429,41 @@
           generateBtn.disabled = true;
           generateBtn.textContent = "Publishing...";
 
-          // Get current file SHA
-          const getFileUrl = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dataFile}`;
-          const getResponse = await fetch(getFileUrl, {
-            headers: {
-              "Authorization": `token ${token}`,
-              "Accept": "application/vnd.github.v3+json"
-            }
-          });
-
-          let sha = null;
-          if (getResponse.ok) {
-            const fileData = await getResponse.json();
-            sha = fileData.sha;
-          }
-
-          // Update file
-          const content = btoa(JSON.stringify(data, null, 2));
-          const updateUrl = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dataFile}`;
-          const updateResponse = await fetch(updateUrl, {
-            method: "PUT",
+          // Trigger GitHub Actions workflow
+          const workflowUrl = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/actions/workflows/update-weather.yml/dispatches`;
+          const response = await fetch(workflowUrl, {
+            method: "POST",
             headers: {
               "Authorization": `token ${token}`,
               "Accept": "application/vnd.github.v3+json",
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              message: data.message ? `Update weather alert: ${data.message.substring(0, 50)}...` : "Clear weather alert",
-              content: content,
-              branch: CONFIG.branch,
-              ...(sha && { sha })
+              ref: CONFIG.branch,
+              inputs: {
+                message: data.message || "",
+                york: String(data.campuses.york),
+                springGrove: String(data.campuses.springGrove),
+                stewartstown: String(data.campuses.stewartstown),
+                validForHours: String(data.validForHours || 0),
+                issuedAt: data.issuedAt || "",
+                validUntil: data.validUntil || ""
+              }
             })
           });
 
-          if (!updateResponse.ok) {
-            const error = await updateResponse.json();
-            throw new Error(error.message || "Failed to update repository");
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to trigger workflow");
           }
 
-          showStatus("Alert published successfully!", "success");
-          await loadCurrentStatus();
+          showStatus("Alert publishing started! Updates will appear in 10-20 seconds.", "success");
+          
+          // Poll for updates
+          setTimeout(() => {
+            loadCurrentStatus();
+          }, 15000);
+          
           return true;
 
         } catch (error) {

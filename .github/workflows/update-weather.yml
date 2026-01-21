@@ -1,0 +1,70 @@
+name: Update Weather Alert
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Alert message'
+        required: true
+        type: string
+      york:
+        description: 'York campus affected'
+        required: true
+        type: boolean
+      springGrove:
+        description: 'Spring Grove campus affected'
+        required: true
+        type: boolean
+      stewartstown:
+        description: 'Stewartstown campus affected'
+        required: true
+        type: boolean
+      validForHours:
+        description: 'Valid duration in hours'
+        required: true
+        type: number
+      issuedAt:
+        description: 'Issued timestamp'
+        required: true
+        type: string
+      validUntil:
+        description: 'Expiration timestamp'
+        required: true
+        type: string
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update weather data
+        run: |
+          cat > weather-update.json << 'EOF'
+          {
+            "campuses": {
+              "york": ${{ inputs.york }},
+              "springGrove": ${{ inputs.springGrove }},
+              "stewartstown": ${{ inputs.stewartstown }}
+            },
+            "message": "${{ inputs.message }}",
+            "validForHours": ${{ inputs.validForHours }},
+            "validUntil": "${{ inputs.validUntil }}",
+            "issuedAt": "${{ inputs.issuedAt }}"
+          }
+          EOF
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "Weather Update Bot"
+          git config user.email "weather-update-bot@users.noreply.github.com"
+          git add weather-update.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update weather alert: ${{ inputs.message }}"
+            git push
+          fi

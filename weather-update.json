@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": true,
+    "york": false,
     "springGrove": false,
     "stewartstown": false
   },
-  "message": "Testing weather alert",
-  "validForHours": 0.0833,
-  "validUntil": "2026-01-21T18:40:42.957Z",
-  "issuedAt": "2026-01-21T18:35:43.077Z"
+  "message": null,
+  "validForHours": null,
+  "validUntil": null,
+  "issuedAt": null
 }

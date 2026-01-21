@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": true,
-    "springGrove": true,
-    "stewartstown": true
+    "york": false,
+    "springGrove": false,
+    "stewartstown": false
   },
-  "message": "Test Alert - There is no weather update at this time -",
-  "validForHours": 1,
-  "validUntil": "2026-01-21T21:40:21.972Z",
-  "issuedAt": "2026-01-21T20:40:21.972Z"
+  "message": null,
+  "validForHours": null,
+  "validUntil": null,
+  "issuedAt": null
 }

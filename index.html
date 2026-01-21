@@ -327,9 +327,21 @@
           </div>
 
           <div class="field" style="margin-top: 16px;">
-            <label>Embed Code (for Squarespace)</label>
-            <div class="code-block" id="embedCode">(Click Generate Update first)</div>
-            <div class="hint">Copy this code into each campus page. Change CAMPUS_KEY to: 'york', 'springGrove', or 'stewartstown'</div>
+            <label>Embed Code - York Campus</label>
+            <div class="code-block" id="embedCodeYork">(Click Generate Update first)</div>
+            <div class="hint">Copy this code into York campus Squarespace page</div>
+          </div>
+
+          <div class="field">
+            <label>Embed Code - Spring Grove Campus</label>
+            <div class="code-block" id="embedCodeSpringGrove">(Click Generate Update first)</div>
+            <div class="hint">Copy this code into Spring Grove campus Squarespace page</div>
+          </div>
+
+          <div class="field">
+            <label>Embed Code - Stewartstown Campus</label>
+            <div class="code-block" id="embedCodeStewartstown">(Click Generate Update first)</div>
+            <div class="hint">Copy this code into Stewartstown campus Squarespace page</div>
           </div>
         </section>
       </div>
@@ -352,7 +364,9 @@
       const generateBtn = document.getElementById("generateUpdate");
       const clearBtn = document.getElementById("clearUpdate");
       const previewText = document.getElementById("previewText");
-      const embedCode = document.getElementById("embedCode");
+      const embedCodeYork = document.getElementById("embedCodeYork");
+      const embedCodeSpringGrove = document.getElementById("embedCodeSpringGrove");
+      const embedCodeStewartstown = document.getElementById("embedCodeStewartstown");
       const statusPill = document.getElementById("statusPill");
       const metaInfo = document.getElementById("metaInfo");
       const setupAlert = document.getElementById("setupAlert");
@@ -520,22 +534,19 @@
 
       function updateEmbedCode() {
         const scriptClose = "</scr" + "ipt>";
-        embedCode.textContent = `<!-- Weather Update Banner -->
-<!-- IMPORTANT: Change CAMPUS_KEY below to 'york', 'springGrove', or 'stewartstown' -->
-<div id="weather-banner" style="display:none; padding: 14px 18px; border-radius: 8px; background: #F97316; border: 2px solid #EA580C; font-family: 'Sora', sans-serif; color: #FFFFFF; margin-bottom: 16px; font-weight: 700;"></div>
+        const generateCode = (campusKey, campusLabel) => `<!-- Weather Update Banner for ${campusLabel} -->
+<div id="weather-banner-${campusKey}" style="display:none; padding: 14px 18px; border-radius: 8px; background: #F97316; border: 2px solid #EA580C; font-family: 'Sora', sans-serif; color: #FFFFFF; margin-bottom: 16px; font-weight: 700;"></div>
 <script>
 (function() {
-  const CAMPUS_KEY = "york"; // Change this to: 'york', 'springGrove', or 'stewartstown'
-  
   fetch("${CONFIG.dataUrl}?t=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
     .then(data => {
-      const banner = document.getElementById("weather-banner");
+      const banner = document.getElementById("weather-banner-${campusKey}");
       const isLive = data.message && 
                      data.validUntil && 
                      new Date(data.validUntil) > Date.now() &&
                      data.campuses && 
-                     data.campuses[CAMPUS_KEY];
+                     data.campuses.${campusKey};
       
       if (isLive) {
         banner.textContent = "⚠ " + data.message;
@@ -545,6 +556,10 @@
     .catch(() => {});
 })();
 ${scriptClose}`;
+
+        embedCodeYork.textContent = generateCode('york', 'York Campus');
+        embedCodeSpringGrove.textContent = generateCode('springGrove', 'Spring Grove Campus');
+        embedCodeStewartstown.textContent = generateCode('stewartstown', 'Stewartstown Campus');
       }
 
       generateBtn.addEventListener("click", async () => {

@@ -1,11 +1,11 @@
 {
   "campuses": {
     "york": true,
-    "springGrove": true,
-    "stewartstown": true
+    "springGrove": false,
+    "stewartstown": false
   },
-  "message": "The weather today is fine. There are no alerts.",
+  "message": "Test alert - all events are running on time",
   "validForHours": 0.0833,
-  "validUntil": "2026-01-21T21:25:56.255Z",
-  "issuedAt": "2026-01-21T21:20:56.375Z"
+  "validUntil": "2026-01-21T22:48:21.858Z",
+  "issuedAt": "2026-01-21T22:43:21.977Z"
 }

@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": false,
-    "springGrove": false,
-    "stewartstown": false
+    "york": true,
+    "springGrove": true,
+    "stewartstown": true
   },
-  "message": null,
-  "validForHours": null,
-  "validUntil": null,
-  "issuedAt": null
+  "message": "The weather today is fine. There are no alerts.",
+  "validForHours": 0.0833,
+  "validUntil": "2026-01-21T21:25:56.255Z",
+  "issuedAt": "2026-01-21T21:20:56.375Z"
 }

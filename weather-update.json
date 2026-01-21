@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": false,
-    "springGrove": false,
-    "stewartstown": false
+    "york": true,
+    "springGrove": true,
+    "stewartstown": true
   },
-  "message": "",
-  "validForHours": null,
-  "validUntil": null,
-  "issuedAt": null
+  "message": "Test Alert",
+  "validForHours": 1,
+  "validUntil": "2026-01-21T18:31:51.858Z",
+  "issuedAt": "2026-01-21T17:31:51.858Z"
 }

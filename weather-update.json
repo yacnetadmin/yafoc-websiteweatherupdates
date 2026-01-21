@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": false,
+    "york": true,
     "springGrove": false,
     "stewartstown": false
   },
-  "message": "",
-  "validForHours": 0,
-  "validUntil": "",
-  "issuedAt": ""
+  "message": "Test Alert Orange",
+  "validForHours": 0.0833,
+  "validUntil": "2026-01-21T18:23:29.411Z",
+  "issuedAt": "2026-01-21T18:18:29.531Z"
 }

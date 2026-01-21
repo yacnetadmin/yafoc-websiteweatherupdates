@@ -319,12 +319,17 @@
       }
 
       @media (max-width: 600px) {
+        body {
+          padding: 0 8px;
+        }
+
         .page {
-          padding: 24px 12px 48px;
+          padding: 24px 8px 48px;
+          max-width: 100%;
         }
 
         .card {
-          padding: 20px;
+          padding: 16px;
           border-radius: 14px;
         }
 
@@ -338,6 +343,29 @@
 
         button {
           width: 100%;
+        }
+
+        .code-block {
+          font-size: 0.75rem;
+          padding: 12px;
+          word-break: break-all;
+          overflow-wrap: break-word;
+        }
+
+        .preview-block {
+          font-size: 0.9rem;
+          padding: 12px 14px;
+        }
+
+        textarea,
+        select,
+        input[type="text"] {
+          font-size: 0.9rem;
+          padding: 10px;
+        }
+
+        .field {
+          margin-bottom: 16px;
         }
       }
     </style>

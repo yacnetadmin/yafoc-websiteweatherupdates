@@ -490,7 +490,7 @@
         statusPill.textContent = isLive ? "Status: Live Alert" : "Status: No Alert";
         statusPill.style.background = isLive ? "#d2e8df" : "#f1dfd0";
         
-        previewText.textContent = isLive ? "⚠️ " + data.message : "No active update.";
+        previewText.textContent = isLive ? "⚠ " + data.message : "No active update.";
         
         const campuses = data.campuses ? Object.keys(data.campuses).filter(k => data.campuses[k]) : [];
         metaInfo.innerHTML = `
@@ -506,7 +506,7 @@
       function updateEmbedCode() {
         const scriptClose = "</scr" + "ipt>";
         embedCode.textContent = `<!-- Weather Update Banner -->
-<div id="weather-banner" style="display:none; padding: 14px 18px; border-radius: 8px; background: #F97316; border: 2px solid #EA580C; font-family: 'Sora', sans-serif; color: #FFFFFF; margin-bottom: 16px; font-weight: 500;"></div>
+<div id="weather-banner" style="display:none; padding: 14px 18px; border-radius: 8px; background: #F97316; border: 2px solid #EA580C; font-family: 'Sora', sans-serif; color: #FFFFFF; margin-bottom: 16px; font-weight: 700;"></div>
 <script>
 (function() {
   fetch("${CONFIG.dataUrl}?t=" + Date.now(), { cache: "no-store" })
@@ -515,7 +515,7 @@
       const banner = document.getElementById("weather-banner");
       const isLive = data.message && data.validUntil && new Date(data.validUntil) > Date.now();
       if (isLive) {
-        banner.textContent = "⚠️ " + data.message;
+        banner.textContent = "⚠ " + data.message;
         banner.style.display = "block";
       }
     })

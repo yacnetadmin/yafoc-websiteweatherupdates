@@ -275,14 +275,15 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(4, 12, 27, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 999px;
         padding: 6px 12px;
         font-family: var(--font-body);
         font-size: 0.78rem;
         letter-spacing: 0.04em;
-        color: var(--text);
+        font-weight: 600;
+        color: #9bb4d4;
       }
 
       .alert {
@@ -313,6 +314,12 @@
 
       @media (max-width: 900px) {
         .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .radio-group {
           grid-template-columns: 1fr;
         }
       }

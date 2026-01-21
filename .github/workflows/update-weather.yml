@@ -5,32 +5,39 @@ on:
     inputs:
       message:
         description: 'Alert message'
-        required: true
+        required: false
         type: string
+        default: ''
       york:
         description: 'York campus affected'
-        required: true
+        required: false
         type: boolean
+        default: false
       springGrove:
         description: 'Spring Grove campus affected'
-        required: true
+        required: false
         type: boolean
+        default: false
       stewartstown:
         description: 'Stewartstown campus affected'
-        required: true
+        required: false
         type: boolean
+        default: false
       validForHours:
         description: 'Valid duration in hours'
-        required: true
+        required: false
         type: number
+        default: 0
       issuedAt:
         description: 'Issued timestamp'
-        required: true
+        required: false
         type: string
+        default: ''
       validUntil:
         description: 'Expiration timestamp'
-        required: true
+        required: false
         type: string
+        default: ''
 
 jobs:
   update:

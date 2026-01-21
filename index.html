@@ -243,8 +243,8 @@
       </header>
 
       <div id="setupAlert" class="alert alert-info" style="display: none;">
-        <strong>First Time Setup:</strong> Enter your GitHub Personal Access Token below to enable automatic publishing.
-        <a href="https://github.com/settings/tokens/new?scopes=actions:write&description=Weather%20Update%20Publisher" target="_blank" style="color: #075985; text-decoration: underline;">Create token here</a>
+        <strong>First Time Setup:</strong> Create a fine-grained token with Actions (read/write) + Contents (read/write) permissions.
+        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="color: #075985; text-decoration: underline;">Create token here</a>
       </div>
 
       <div id="statusAlert" style="display: none;"></div>
@@ -258,10 +258,10 @@
             <input
               type="text"
               id="githubToken"
-              placeholder="ghp_..."
+              placeholder="github_pat_... or ghp_..."
               autocomplete="off"
             />
-            <div class="hint">Required to trigger updates. Needs 'actions:write' scope. <a href="https://github.com/settings/tokens/new?scopes=actions:write&description=Weather%20Update%20Publisher" target="_blank">Get token</a></div>
+            <div class="hint">Fine-grained token needs: Actions (read/write) + Contents (read/write). <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">Create token</a></div>
           </div>
 
           <div class="field">

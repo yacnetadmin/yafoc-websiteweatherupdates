@@ -14,8 +14,20 @@ A simple tool for publishing time-limited weather alerts to your website.
 
 ### 1. Create GitHub Token
 
-1. Go to [GitHub Settings > Tokens](https://github.com/settings/tokens/new?scopes=actions:write&description=Weather%20Update%20Publisher)
-2. Select scope: **`actions:write`** (NOT `repo` - more secure!)
+**For Fine-Grained Token (Recommended):**
+1. Go to [GitHub Settings > Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
+2. **Token name**: Weather Update Publisher
+3. **Expiration**: Choose your preference (90 days recommended)
+4. **Repository access**: Only select repositories → Choose `yafoc-websiteweatherupdates`
+5. **Permissions** (Repository permissions):
+   - **Actions**: Read and write ✅
+   - **Contents**: Read and write ✅
+6. Click "Generate token"
+7. Copy the token (starts with `github_pat_`)
+
+**For Classic Token:**
+1. Go to [GitHub Settings > Tokens](https://github.com/settings/tokens/new?scopes=repo,workflow&description=Weather%20Update%20Publisher)
+2. Select scopes: **`repo`** and **`workflow`**
 3. Click "Generate token"
 4. Copy the token (starts with `ghp_`)
 

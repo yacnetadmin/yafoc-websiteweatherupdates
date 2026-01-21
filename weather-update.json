@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": true,
+    "york": false,
     "springGrove": false,
-    "stewartstown": true
+    "stewartstown": false
   },
-  "message": "Alert Test - All activities are running as scheduled.",
-  "validForHours": 1,
-  "validUntil": "2026-01-22T00:04:13.365Z",
-  "issuedAt": "2026-01-21T23:04:13.365Z"
+  "message": null,
+  "validForHours": null,
+  "validUntil": null,
+  "issuedAt": null
 }

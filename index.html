@@ -161,13 +161,22 @@
       }
 
       .preview-block {
-        border: 1px dashed var(--outline);
-        padding: 16px;
-        border-radius: 14px;
-        background: #fff;
+        border: 2px solid #EA580C;
+        padding: 14px 18px;
+        border-radius: 8px;
+        background: #F97316;
         min-height: 92px;
         font-family: "Sora", "Segoe UI", sans-serif;
         font-size: 0.95rem;
+        color: #FFFFFF;
+        font-weight: 700;
+      }
+
+      .preview-block.inactive {
+        background: #fff;
+        border: 1px dashed var(--outline);
+        color: var(--muted);
+        font-weight: 400;
       }
 
       .meta {
@@ -254,17 +263,6 @@
           <h2>Compose Update</h2>
           
           <div class="field">
-            <label for="githubToken">GitHub Token (stored locally)</label>
-            <input
-              type="text"
-              id="githubToken"
-              placeholder="github_pat_... or ghp_..."
-              autocomplete="off"
-            />
-            <div class="hint">Fine-grained token needs: Actions (read/write) + Contents (read/write). <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">Create token</a></div>
-          </div>
-
-          <div class="field">
             <label for="updateText">Weather Alert Message</label>
             <textarea
               id="updateText"
@@ -295,6 +293,17 @@
             <select id="validHours"></select>
           </div>
 
+          <div class="field">
+            <label for="githubToken">GitHub Token (stored locally)</label>
+            <input
+              type="text"
+              id="githubToken"
+              placeholder="github_pat_... or ghp_..."
+              autocomplete="off"
+            />
+            <div class="hint">Fine-grained token needs: Actions (read/write) + Contents (read/write). <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">Create token</a></div>
+          </div>
+
           <div class="button-row">
             <button type="button" id="generateUpdate">Generate Update</button>
             <button type="button" id="clearUpdate" class="secondary">Clear Alert</button>
@@ -320,7 +329,7 @@
           <div class="field" style="margin-top: 16px;">
             <label>Embed Code (for Squarespace)</label>
             <div class="code-block" id="embedCode">(Click Generate Update first)</div>
-            <div class="hint">Copy this code into a Squarespace Code Block</div>
+            <div class="hint">Copy this code into each campus page. Change CAMPUS_KEY to: 'york', 'springGrove', or 'stewartstown'</div>
           </div>
         </section>
       </div>
@@ -490,7 +499,13 @@
         statusPill.textContent = isLive ? "Status: Live Alert" : "Status: No Alert";
         statusPill.style.background = isLive ? "#d2e8df" : "#f1dfd0";
         
-        previewText.textContent = isLive ? "⚠ " + data.message : "No active update.";
+        if (isLive) {
+          previewText.textContent = "⚠ " + data.message;
+          previewText.classList.remove("inactive");
+        } else {
+          previewText.textContent = "No active update.";
+          previewText.classList.add("inactive");
+        }
         
         const campuses = data.campuses ? Object.keys(data.campuses).filter(k => data.campuses[k]) : [];
         metaInfo.innerHTML = `
@@ -506,14 +521,22 @@
       function updateEmbedCode() {
         const scriptClose = "</scr" + "ipt>";
         embedCode.textContent = `<!-- Weather Update Banner -->
+<!-- IMPORTANT: Change CAMPUS_KEY below to 'york', 'springGrove', or 'stewartstown' -->
 <div id="weather-banner" style="display:none; padding: 14px 18px; border-radius: 8px; background: #F97316; border: 2px solid #EA580C; font-family: 'Sora', sans-serif; color: #FFFFFF; margin-bottom: 16px; font-weight: 700;"></div>
 <script>
 (function() {
+  const CAMPUS_KEY = "york"; // Change this to: 'york', 'springGrove', or 'stewartstown'
+  
   fetch("${CONFIG.dataUrl}?t=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
     .then(data => {
       const banner = document.getElementById("weather-banner");
-      const isLive = data.message && data.validUntil && new Date(data.validUntil) > Date.now();
+      const isLive = data.message && 
+                     data.validUntil && 
+                     new Date(data.validUntil) > Date.now() &&
+                     data.campuses && 
+                     data.campuses[CAMPUS_KEY];
+      
       if (isLive) {
         banner.textContent = "⚠ " + data.message;
         banner.style.display = "block";

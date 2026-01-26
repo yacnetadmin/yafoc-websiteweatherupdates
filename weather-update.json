@@ -1,11 +1,11 @@
 {
   "campuses": {
     "york": true,
-    "springGrove": true,
-    "stewartstown": true
+    "springGrove": false,
+    "stewartstown": false
   },
-  "message": "Weather Closure Notice – York Alliance Family of Churches. Due to the expected winter storm, all Sunday services and activities are canceled at all campuses — York, Spring Grove, and Stewartstown. An online service for all campuses will be available at 8:30am, streaming on YouTube and in the Church Center App under the Sermon tab. Stay safe and warm.",
-  "validForHours": 25,
-  "validUntil": "2026-01-25T17:48:24.989Z",
-  "issuedAt": "2026-01-24T16:48:24.989Z"
+  "message": "Due to weather and road conditions, The York Alliance Church campus and offices will be closed today.  We will be checking messages through out the day.",
+  "validForHours": 9,
+  "validUntil": "2026-01-26T22:02:26.874Z",
+  "issuedAt": "2026-01-26T13:02:26.873Z"
 }

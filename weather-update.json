@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": true,
+    "york": false,
     "springGrove": false,
-    "stewartstown": false
+    "stewartstown": true
   },
-  "message": "Due to weather and road conditions, The York Alliance Church campus and offices will be closed today.  We will be checking messages through out the day.",
-  "validForHours": 9,
-  "validUntil": "2026-01-26T22:02:26.874Z",
-  "issuedAt": "2026-01-26T13:02:26.873Z"
+  "message": "Closed due to expected snow",
+  "validForHours": 6,
+  "validUntil": "2026-02-22T18:12:32.433Z",
+  "issuedAt": "2026-02-22T12:12:32.433Z"
 }

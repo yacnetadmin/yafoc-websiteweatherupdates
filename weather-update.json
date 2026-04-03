@@ -1,11 +1,11 @@
 {
   "campuses": {
-    "york": true,
-    "springGrove": true,
-    "stewartstown": true
+    "york": false,
+    "springGrove": false,
+    "stewartstown": false
   },
-  "message": "Good Friday Service 7 - 8:30 PM at our York Campus - All Campuses will meet at 501 Rathton Road, York PA 17403",
-  "validForHours": 12,
-  "validUntil": "2026-04-04T01:06:11.031Z",
-  "issuedAt": "2026-04-03T13:06:11.030Z"
+  "message": null,
+  "validForHours": null,
+  "validUntil": null,
+  "issuedAt": null
 }
